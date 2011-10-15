@@ -33,6 +33,7 @@ module Blog::Views
 		@posts.each do |po|
 			h2 po.title
 			p po.content
+		end
 	end
 	def post
 		h1 @post.title
@@ -42,16 +43,17 @@ end
 
 module Blog::Models
 	class Post < Base
-	validates_presence_of :title
-	validates_presence_of :content
+		validates_presence_of :title
+		validates_presence_of :content
 	end
 	
 	class Fields < V 1.0
 		def self.up
 			create_table Post.table_name do |t|
-			t.string :title
-			t.text 	:content
-			t.timestamps
+				t.string :title
+				t.text 	:content
+				t.timestamps
+			end
 		end
 		
 		def self.down
