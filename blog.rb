@@ -1,5 +1,7 @@
 Camping.goes :Blog
 
+include Blog::Models
+
 module Blog::Controllers
 	class Index
 		def get
@@ -31,7 +33,9 @@ module Blog::Views
 
 	def index
 		@posts.each do |po|
-			h2 po.title
+			h2 do
+				a po.title, :href => R(PostX, po.title)
+			end
 			p po.content
 		end
 	end
