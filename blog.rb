@@ -1,18 +1,42 @@
 Camping.goes :Blog
 
-include Blog::Models
-
 module Blog::Controllers
 	class Index
 		def get
-			@posts = Post.all
-			render :index
+			if Post.all.empty?
+				render :noposts
+			else
+				@posts = Post.all.sort_by{ |p| p.created_at }.reverse
+				render :index
+			end
 		end
 	end
 	class PostX
 		def get(title)
 			@post = Post.find_by_title(title)
 			render :post
+		end
+	end
+
+	class New
+		def get
+			render :newform
+		end
+
+		def post
+			Post.create(:title => @input.title, :content => @input.content)
+			redirect Index
+		end
+	end
+
+	class RemoveN
+		def get(id)
+			@post = Post.find(id)
+			render :sure
+		end
+		def post
+			Post.delete
+			redirect Index
 		end
 	end
 end
@@ -39,9 +63,38 @@ module Blog::Views
 			p po.content
 		end
 	end
+
+	def noposts
+		h2 do
+			a "No posts found, create new post?", :href => R(New)
+		end
+	end
 	def post
 		h1 @post.title
 		p  @post.content
+		br
+
+		a "Delete post", :href => R(Remove, @post.id)
+	end
+
+	def newform
+		form :action => R(New), :method => :post do
+			p "Title:"
+			input :type => :text, :name => :title
+			p "Content:"
+			textarea "", :name => :content, :rows => 30, :cols => 50
+
+			br
+
+			input :type => :submit, :value => :Submit!
+		end
+	end
+
+	def sure
+		h1 "Are you sure?"
+		form :action => R(Remove), :method => :post do
+			input :type => :submit, :value => :Yes!
+		end
 	end
 end
 
